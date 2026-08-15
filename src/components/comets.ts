@@ -11,6 +11,8 @@ import {
   Vector3,
   Vector2,
   Color,
+  type PerspectiveCamera,
+  type WebGLRenderer,
 } from "three";
 import { Line2 } from "three/examples/jsm/lines/Line2.js";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
@@ -19,10 +21,11 @@ import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 const COMET_COLORS = ["#bfe3ff", "#ffd9a0", "#cfe0ff", "#ffe9c9"];
 const TRAIL_SEGMENTS = 64;
 
-function makeGlowTexture(color) {
+function makeGlowTexture(color: string): CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 64;
   const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context unavailable");
 
   const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
   grad.addColorStop(0, color);
@@ -34,11 +37,20 @@ function makeGlowTexture(color) {
 }
 
 class Comet {
-  constructor(color, segments, renderer) {
+  segments: number;
+  head = new Vector3();
+  velocity = new Vector3();
+  group = new Group();
+  positions: Float32Array;
+  colors: Float32Array;
+  lineGeometry: LineGeometry;
+  lineMaterial: LineMaterial;
+  dustGeometry: BufferGeometry;
+  headSprite: Sprite;
+  coreSprite: Sprite;
+
+  constructor(color: string, segments: number, renderer: WebGLRenderer) {
     this.segments = segments;
-    this.head = new Vector3();
-    this.velocity = new Vector3();
-    this.group = new Group();
 
     this.positions = new Float32Array(segments * 3);
     this.colors = new Float32Array(segments * 3);
@@ -70,17 +82,16 @@ class Comet {
 
     this.group.add(new Line2(this.lineGeometry, this.lineMaterial));
 
-    const dustGeometry = new BufferGeometry();
-    dustGeometry.setAttribute(
+    this.dustGeometry = new BufferGeometry();
+    this.dustGeometry.setAttribute(
       "position",
       new Float32BufferAttribute(this.positions, 3)
     );
-    dustGeometry.setAttribute("color", new Float32BufferAttribute(this.colors, 3));
-    this.dustGeometry = dustGeometry;
+    this.dustGeometry.setAttribute("color", new Float32BufferAttribute(this.colors, 3));
 
     this.group.add(
       new Points(
-        dustGeometry,
+        this.dustGeometry,
         new PointsMaterial({
           size: 0.09,
           vertexColors: true,
@@ -121,7 +132,7 @@ class Comet {
     });
   }
 
-  placeTrailAt(head) {
+  placeTrailAt(head: Vector3): void {
     for (let i = 0; i < this.segments; i++) {
       this.positions[i * 3] = head.x;
       this.positions[i * 3 + 1] = head.y;
@@ -132,7 +143,7 @@ class Comet {
     this.coreSprite.position.copy(head);
   }
 
-  update(delta) {
+  update(delta: number): void {
     this.head.addScaledVector(this.velocity, delta);
 
     const pos = this.positions;
@@ -153,11 +164,14 @@ class Comet {
 }
 
 class Comets {
-  constructor(count = 4, camera, renderer) {
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
+  group = new Group();
+  comets: Comet[] = [];
+
+  constructor(count = 4, camera: PerspectiveCamera, renderer: WebGLRenderer) {
     this.camera = camera;
     this.renderer = renderer;
-    this.group = new Group();
-    this.comets = [];
 
     for (let i = 0; i < count; i++) {
       const comet = new Comet(
@@ -171,7 +185,7 @@ class Comets {
     }
   }
 
-  boundsFor(comet) {
+  boundsFor(comet: Comet): { halfW: number; halfH: number } {
     const fov = (this.camera.fov * Math.PI) / 180;
     const dist = this.camera.position.z - comet.head.z;
     const halfHeight = dist * Math.tan(fov / 2);
@@ -180,7 +194,7 @@ class Comets {
     return { halfW: halfHeight * aspect, halfH: halfHeight };
   }
 
-  reset(comet) {
+  reset(comet: Comet): void {
     comet.head.z = -6 + Math.random() * 4;
     const { halfW, halfH } = this.boundsFor(comet);
     const margin = 1.5;
@@ -207,7 +221,7 @@ class Comets {
     comet.placeTrailAt(comet.head);
   }
 
-  update(delta) {
+  update(delta: number): void {
     this.comets.forEach((comet) => {
       comet.update(delta);
       const { halfW, halfH } = this.boundsFor(comet);

@@ -1,11 +1,80 @@
-export const SECTIONS = [
+export type Lang = "pt" | "en";
+
+export interface SectionConfig {
+  id: string;
+  shape: string;
+  color: string;
+  ring: boolean;
+  size?: number;
+}
+
+export interface ProjectItem {
+  name: string;
+  desc: string;
+  tags: string[];
+  link: string;
+  details: string;
+  highlights: string[];
+}
+
+export interface SkillGroup {
+  label: string;
+  items: string[];
+}
+
+export interface TimelineEntry {
+  period: string;
+  title: string;
+  place: string;
+  desc: string;
+}
+
+export interface Social {
+  label: string;
+  url: string;
+}
+
+export interface Translation {
+  nav: { home: string; projects: string; about: string; contact: string };
+  hero: { greeting: string; name: string; role: string; intro: string; cta: string };
+  projects: {
+    title: string;
+    subtitle: string;
+    detailsLabel: string;
+    closeLabel: string;
+    items: ProjectItem[];
+  };
+  about: {
+    title: string;
+    p1: string;
+    p2: string;
+    p3: string;
+    skillsLabel: string;
+    skillGroups: SkillGroup[];
+    languagesLabel: string;
+    languages: string[];
+    timelineLabel: string;
+    timeline: TimelineEntry[];
+  };
+  contact: {
+    title: string;
+    subtitle: string;
+    emailLabel: string;
+    email: string;
+    socials: Social[];
+    cvLabel: string;
+    cvUrl: string;
+  };
+}
+
+export const SECTIONS: SectionConfig[] = [
   { id: "home", shape: "torusKnot", color: "#5ec8b8", ring: true },
   { id: "projects", shape: "icosahedron", color: "#e8925f", ring: false },
   { id: "about", shape: "dodecahedron", color: "#a98ce8", ring: true },
   { id: "contact", shape: "octahedron", color: "#e8c46a", ring: false },
 ];
 
-export const translations = {
+export const translations: Record<Lang, Translation> = {
   pt: {
     nav: {
       home: "Início",

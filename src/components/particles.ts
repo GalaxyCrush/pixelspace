@@ -12,7 +12,13 @@ import {
   AdditiveBlending,
 } from "three";
 
-function starField(count, radiusMin, radiusMax, color, size) {
+function starField(
+  count: number,
+  radiusMin: number,
+  radiusMax: number,
+  color: number,
+  size: number
+): Points {
   const positions = new Float32Array(count * 3);
 
   for (let i = 0; i < count; i++) {
@@ -40,10 +46,11 @@ function starField(count, radiusMin, radiusMax, color, size) {
   return new Points(geometry, material);
 }
 
-function createGlowTexture(color) {
+function createGlowTexture(color: string): CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 128;
   const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context unavailable");
 
   const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
   grad.addColorStop(0, color);
@@ -54,8 +61,8 @@ function createGlowTexture(color) {
   return new CanvasTexture(canvas);
 }
 
-function createStreaks(count = 5) {
-  const positions = [];
+function createStreaks(count = 5): LineSegments {
+  const positions: number[] = [];
 
   for (let i = 0; i < count; i++) {
     const x = -14 + Math.random() * 28;
@@ -81,7 +88,7 @@ function createStreaks(count = 5) {
   return new LineSegments(geometry, material);
 }
 
-function createParticles() {
+function createParticles(): Group {
   const group = new Group();
   group.add(starField(1200, 10, 30, 0xcfd8ff, 0.05));
   group.add(starField(140, 10, 28, 0xffd9a0, 0.12));
@@ -89,10 +96,16 @@ function createParticles() {
   return group;
 }
 
-function createNebulas() {
+interface NebulaSpot {
+  pos: [number, number, number];
+  color: string;
+  scale: number;
+}
+
+function createNebulas(): Group {
   const group = new Group();
 
-  const spots = [
+  const spots: NebulaSpot[] = [
     { pos: [-14, 7, -10], color: "rgba(140,100,255,0.45)", scale: 18 },
     { pos: [13, -9, -12], color: "rgba(80,200,190,0.4)", scale: 16 },
     { pos: [-9, -13, -14], color: "rgba(255,130,60,0.3)", scale: 13 },

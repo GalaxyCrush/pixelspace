@@ -1,6 +1,6 @@
-import { AmbientLight, PointLight } from "three";
+import { AmbientLight, PointLight, type Scene } from "three";
 
-function addLights(scene) {
+function addLights(scene: Scene): void {
   const ambient = new AmbientLight(0xffffff, 0.35);
   scene.add(ambient);
 

@@ -6,7 +6,7 @@ Personal portfolio with a space-themed 3D scene, built with Three.js and Vite. E
 
 - Vite 8
 - Three.js
-- JavaScript (vanilla)
+- TypeScript
 - CSS
 
 ## Development

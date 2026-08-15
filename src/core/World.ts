@@ -1,4 +1,4 @@
-import { Clock } from "three";
+import { Clock, Group, Mesh, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 
 import { createCamera } from "../components/camera.js";
 import { createScene } from "../components/scene.js";
@@ -15,11 +15,30 @@ import { SECTIONS } from "../data/siteData.js";
 const TRANSITION_DURATION = 0.7;
 const PLANET_X = 2.0;
 
-const easeInOutCubic = (t) =>
+const easeInOutCubic = (t: number): number =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
+interface TransitionState {
+  outgoing: Group;
+  incoming: Group;
+  t: number;
+}
+
 class World {
-  constructor(container) {
+  scene: Scene;
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
+  resizer: Resizer;
+  particles: Group;
+  nebulas: Group;
+  comets: Comets;
+  activeShape: Group | null = null;
+  transition: TransitionState | null = null;
+  section: string | null = null;
+  clock = new Clock();
+  pointer = { x: 0, y: 0 };
+
+  constructor(container: HTMLElement) {
     this.scene = createScene();
     this.camera = createCamera();
     this.renderer = createRenderer();
@@ -38,13 +57,7 @@ class World {
     this.comets = new Comets(5, this.camera, this.renderer);
     this.scene.add(this.comets.group);
 
-    this.activeShape = null;
-    this.transition = null;
-    this.section = null;
-    this.clock = new Clock();
-    this.pointer = { x: 0, y: 0 };
-
-    window.addEventListener("mousemove", (e) => {
+    window.addEventListener("mousemove", (e: MouseEvent) => {
       this.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
     });
@@ -52,22 +65,25 @@ class World {
     this.setSection(SECTIONS[0].id, { instant: true });
   }
 
-  setSection(id, { instant = false } = {}) {
+  setSection(id: string, { instant = false }: { instant?: boolean } = {}): void {
     const config = SECTIONS.find((s) => s.id === id);
     if (!config || this.section === id) return;
     this.section = id;
 
+    let instantMode = instant;
     if (this.transition) {
       this.disposeShape(this.transition.outgoing);
+      this.disposeShape(this.transition.incoming);
       this.transition = null;
+      instantMode = true;
     }
 
     const incoming = createPlanet(config);
     incoming.position.x = PLANET_X;
-    incoming.scale.setScalar(instant ? 1 : 0.01);
+    incoming.scale.setScalar(instantMode ? 1 : 0.01);
     this.scene.add(incoming);
 
-    if (instant) {
+    if (instantMode) {
       if (this.activeShape) this.disposeShape(this.activeShape);
       this.activeShape = incoming;
     } else if (this.activeShape) {
@@ -77,18 +93,19 @@ class World {
     }
   }
 
-  disposeShape(group) {
+  disposeShape(group: Group): void {
     this.scene.remove(group);
     group.traverse((obj) => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      const mesh = obj as Mesh;
+      if (mesh.geometry) mesh.geometry.dispose();
+      if (mesh.material) {
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         materials.forEach((m) => m.dispose());
       }
     });
   }
 
-  update(delta, elapsed) {
+  update(delta: number, elapsed: number): void {
     this.particles.rotation.y += delta * 0.005;
     this.nebulas.rotation.y += delta * 0.003;
     this.comets.update(delta);
@@ -117,7 +134,7 @@ class World {
       this.activeShape.rotation.x += delta * 0.04;
       this.activeShape.position.y = Math.sin(elapsed * 0.5) * 0.08;
 
-      const orbiters = this.activeShape.userData.orbiters;
+      const orbiters = this.activeShape.userData.orbiters as Group[] | undefined;
       if (orbiters) {
         orbiters.forEach((orbit, i) => {
           orbit.rotation.y += delta * (0.35 + i * 0.2);
@@ -126,7 +143,7 @@ class World {
     }
   }
 
-  start() {
+  start(): void {
     this.renderer.setAnimationLoop(() => {
       const delta = Math.min(this.clock.getDelta(), 0.05);
       this.update(delta, this.clock.elapsedTime);

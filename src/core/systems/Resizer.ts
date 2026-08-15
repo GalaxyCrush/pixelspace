@@ -1,5 +1,11 @@
+import { PerspectiveCamera, WebGLRenderer } from "three";
+
 class Resizer {
-    constructor(camera, renderer, container) {
+    private camera: PerspectiveCamera;
+    private renderer: WebGLRenderer;
+    private container: HTMLElement;
+
+    constructor(camera: PerspectiveCamera, renderer: WebGLRenderer, container: HTMLElement) {
         this.camera = camera;
         this.renderer = renderer;
         this.container = container;
@@ -8,7 +14,7 @@ class Resizer {
         window.addEventListener("resize", () => this.setSize());
     }
 
-    setSize() {
+    setSize(): void {
         const width = this.container.clientWidth;
         const height = this.container.clientHeight;
 

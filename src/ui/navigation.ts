@@ -1,16 +1,29 @@
-import { translations } from "../data/siteData.js";
+import {
+  translations,
+  type Lang,
+  type ProjectItem,
+  type Social,
+  type SkillGroup,
+  type TimelineEntry,
+} from "../data/siteData.js";
 
-let currentLang = "en";
-let currentItems = [];
-let currentModalIndex = null;
+import type { World } from "../core/World.js";
 
-function get(key, lang) {
-  return key.split(".").reduce((o, k) => (o ? o[k] : undefined), translations[lang]);
+let currentLang: Lang = "en";
+let currentItems: ProjectItem[] = [];
+let currentModalIndex: number | null = null;
+
+function get(key: string, lang: Lang): string | undefined {
+  return key.split(".").reduce<unknown>(
+    (o, k) => (o ? (o as Record<string, unknown>)[k] : undefined),
+    translations[lang]
+  ) as string | undefined;
 }
 
-function renderProjects(items) {
+function renderProjects(items: ProjectItem[]): void {
   currentItems = items;
   const grid = document.getElementById("projects-grid");
+  if (!grid) return;
   grid.innerHTML = items
     .map(
       (p, i) => `
@@ -27,13 +40,14 @@ function renderProjects(items) {
 
   grid.querySelectorAll(".project-card").forEach((card) => {
     card.addEventListener("click", () => {
-      openProject(Number(card.dataset.index));
+      openProject(Number((card as HTMLElement).dataset.index));
     });
   });
 }
 
-function renderSkills(groups) {
+function renderSkills(groups: SkillGroup[]): void {
   const container = document.getElementById("skills");
+  if (!container) return;
   container.innerHTML = groups
     .map(
       (g) => `
@@ -45,20 +59,23 @@ function renderSkills(groups) {
     .join("");
 }
 
-function renderLanguages(languages) {
+function renderLanguages(languages: string[]): void {
   const container = document.getElementById("languages");
+  if (!container) return;
   container.innerHTML = languages.map((l) => `<span class="chip">${l}</span>`).join("");
 }
 
-function renderSocials(socials) {
+function renderSocials(socials: Social[]): void {
   const container = document.getElementById("socials");
+  if (!container) return;
   container.innerHTML = socials
     .map((s) => `<a class="btn btn-ghost" href="${s.url}" target="_blank" rel="noopener">${s.label}</a>`)
     .join("");
 }
 
-function renderTimeline(entries) {
+function renderTimeline(entries: TimelineEntry[]): void {
   const container = document.getElementById("timeline");
+  if (!container) return;
   container.innerHTML = entries
     .map(
       (e) => `
@@ -74,8 +91,9 @@ function renderTimeline(entries) {
     .join("");
 }
 
-function renderCvButton(cvUrl, label) {
-  const container = document.getElementById("cv-button");
+function renderCvButton(cvUrl: string, label: string): void {
+  const container = document.getElementById("cv-button") as HTMLAnchorElement | null;
+  if (!container) return;
   if (!cvUrl) {
     container.hidden = true;
     return;
@@ -85,34 +103,34 @@ function renderCvButton(cvUrl, label) {
   container.href = cvUrl;
 }
 
-function openProject(index) {
+function openProject(index: number): void {
   const item = currentItems[index];
   if (!item) return;
   currentModalIndex = index;
   const t = translations[currentLang];
-  const modal = document.getElementById("project-modal");
-  document.getElementById("modal-title").textContent = item.name;
-  document.getElementById("modal-details").textContent = item.details;
-  document.getElementById("modal-highlights").innerHTML = item.highlights
+  const modal = document.getElementById("project-modal") as HTMLDialogElement;
+  document.getElementById("modal-title")!.textContent = item.name;
+  document.getElementById("modal-details")!.textContent = item.details;
+  document.getElementById("modal-highlights")!.innerHTML = item.highlights
     .map((h) => `<li>${h}</li>`)
     .join("");
-  document.getElementById("modal-tags").innerHTML = item.tags
+  document.getElementById("modal-tags")!.innerHTML = item.tags
     .map((tag) => `<span class="chip">${tag}</span>`)
     .join("");
-  const link = document.getElementById("modal-link");
+  const link = document.getElementById("modal-link") as HTMLAnchorElement;
   link.href = item.link;
   link.textContent = "GitHub ↗";
-  document.getElementById("modal-close-label").textContent = t.projects.closeLabel;
+  document.getElementById("modal-close-label")!.textContent = t.projects.closeLabel;
   modal.showModal();
 }
 
-function closeProject() {
-  document.getElementById("project-modal").close();
+function closeProject(): void {
+  (document.getElementById("project-modal") as HTMLDialogElement).close();
   currentModalIndex = null;
 }
 
-function initModal() {
-  const modal = document.getElementById("project-modal");
+function initModal(): void {
+  const modal = document.getElementById("project-modal") as HTMLDialogElement;
   document.querySelectorAll("#modal-close, #modal-close-label").forEach((el) => {
     el.addEventListener("click", closeProject);
   });
@@ -121,16 +139,16 @@ function initModal() {
   });
 }
 
-function translate() {
+function translate(): void {
   const t = translations[currentLang];
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const value = get(el.dataset.i18n, currentLang);
+    const value = get(el.getAttribute("data-i18n")!, currentLang);
     if (value !== undefined) el.textContent = value;
   });
 
   document.querySelectorAll("[data-i18n-href]").forEach((el) => {
-    const value = get(el.dataset.i18nHref, currentLang);
+    const value = get(el.getAttribute("data-i18n-href")!, currentLang);
     if (value !== undefined) el.setAttribute("href", value);
   });
 
@@ -143,44 +161,44 @@ function translate() {
 
   if (currentModalIndex !== null && currentItems[currentModalIndex]) {
     const item = currentItems[currentModalIndex];
-    document.getElementById("modal-title").textContent = item.name;
-    document.getElementById("modal-details").textContent = item.details;
-    document.getElementById("modal-highlights").innerHTML = item.highlights
+    document.getElementById("modal-title")!.textContent = item.name;
+    document.getElementById("modal-details")!.textContent = item.details;
+    document.getElementById("modal-highlights")!.innerHTML = item.highlights
       .map((h) => `<li>${h}</li>`)
       .join("");
-    document.getElementById("modal-tags").innerHTML = item.tags
+    document.getElementById("modal-tags")!.innerHTML = item.tags
       .map((tag) => `<span class="chip">${tag}</span>`)
       .join("");
-    document.getElementById("modal-close-label").textContent = t.projects.closeLabel;
+    document.getElementById("modal-close-label")!.textContent = t.projects.closeLabel;
   }
 
-  const langBtn = document.getElementById("lang-toggle");
+  const langBtn = document.getElementById("lang-toggle")!;
   langBtn.textContent = currentLang === "pt" ? "EN" : "PT";
   document.title = t.hero.name + " · " + t.hero.role;
 }
 
-function setActiveSection(id) {
+function setActiveSection(id: string): void {
   document.querySelectorAll("[data-section]").forEach((link) => {
-    link.classList.toggle("active", link.dataset.section === id);
+    link.classList.toggle("active", link.getAttribute("data-section") === id);
   });
   document.querySelectorAll(".section").forEach((section) => {
     section.classList.toggle("active", section.id === id);
   });
 }
 
-function initNavigation(world) {
+function initNavigation(world: World): void {
   initModal();
 
   document.querySelectorAll("[data-section]").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      const id = link.dataset.section;
+      const id = link.getAttribute("data-section")!;
       world.setSection(id);
       setActiveSection(id);
     });
   });
 
-  document.getElementById("lang-toggle").addEventListener("click", () => {
+  document.getElementById("lang-toggle")!.addEventListener("click", () => {
     currentLang = currentLang === "pt" ? "en" : "pt";
     translate();
   });

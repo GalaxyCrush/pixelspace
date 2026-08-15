@@ -1,6 +1,6 @@
 import { WebGLRenderer } from "three";
 
-function createRenderer() {
+function createRenderer(): WebGLRenderer {
     return new WebGLRenderer({ antialias: true });
 }
 

@@ -14,17 +14,20 @@ import {
   Float32BufferAttribute,
 } from "three";
 
-function rgba(hex, alpha) {
+import type { SectionConfig } from "../data/siteData.js";
+
+function rgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function createRingTexture(color) {
+function createRingTexture(color: string): CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 256;
   const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context unavailable");
 
   const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
   grad.addColorStop(0, "rgba(0,0,0,0)");
@@ -47,7 +50,7 @@ function createRingTexture(color) {
   return new CanvasTexture(canvas);
 }
 
-function pseudoNoise(x, y, z) {
+function pseudoNoise(x: number, y: number, z: number): number {
   return (
     Math.sin(x * 2.3) * Math.cos(y * 1.7) * Math.sin(z * 2.1) +
     Math.sin(x * 4.7 + y * 3.1) * Math.cos(z * 3.7) * 0.5 +
@@ -55,16 +58,16 @@ function pseudoNoise(x, y, z) {
   );
 }
 
-function smoothstep(t, a, b) {
+function smoothstep(t: number, a: number, b: number): number {
   const x = Math.min(1, Math.max(0, (t - a) / (b - a)));
   return x * x * (3 - 2 * x);
 }
 
-function lighten(color, amount) {
+function lighten(color: Color, amount: number): Color {
   return color.clone().lerp(new Color(0xffffff), amount);
 }
 
-function createMoon(color, orbitRadius) {
+function createMoon(color: Color, orbitRadius: number): Group {
   const orbit = new Group();
   orbit.rotation.y = Math.random() * Math.PI * 2;
 
@@ -82,7 +85,7 @@ function createMoon(color, orbitRadius) {
   return orbit;
 }
 
-function createPlanet(config) {
+function createPlanet(config: SectionConfig): Group {
   const group = new Group();
   const size = config.size ?? 1.0;
 
@@ -90,7 +93,7 @@ function createPlanet(config) {
   const positions = geometry.attributes.position;
   const base = new Color(config.color);
   const land = lighten(base, 0.35);
-  const colors = [];
+  const colors: number[] = [];
   const v = new Vector3();
 
   for (let i = 0; i < positions.count; i++) {
@@ -131,7 +134,7 @@ function createPlanet(config) {
   );
   group.add(atmosphere);
 
-  const orbiters = [];
+  const orbiters: Group[] = [];
 
   if (config.ring) {
     const ring = new Mesh(
