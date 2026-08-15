@@ -1,7 +1,7 @@
 import { WebGLRenderer } from "three";
 
-function createRenderer(container) {
-    return new WebGLRenderer();
+function createRenderer() {
+    return new WebGLRenderer({ antialias: true });
 }
 
 export { createRenderer };

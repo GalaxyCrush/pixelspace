@@ -1,10 +1,11 @@
 import { World } from './World.js'
+import { initNavigation } from '../ui/navigation.js'
 
 function main() {
     const container = document.getElementById('scene-container');
-    console.log(container);
     const world = new World(container);
-    world.render();
+    world.start();
+    initNavigation(world);
 }
 
 main();

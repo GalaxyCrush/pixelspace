@@ -1,25 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Discoverthreejs.com - The Structure of a three.js App</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8" />
-
-  <link rel="icon" href="https://discoverthreejs.com/favicon.ico" type="image/x-icon">
-
-  <link href="./styles/style.css" rel="stylesheet" type="text/css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PixelSpace</title>
+  <link href="./styles/style.css" rel="stylesheet" type="text/css" />
   <script type="module" src="./src/core/main.js"></script>
 </head>
 
 <body>
-  <h1>Discoverthreejs.com - Nothing to see here yet :)</h1>
+  <div id="scene-container"></div>
 
-  <div id="scene-container">
-    <canvas id="webgl"></canvas>
-  </div>
+  <header class="navbar">
+    <a href="#" class="brand" data-section="home">Pixel<span class="accent">Space</span></a>
+    <nav>
+      <a href="#home" data-section="home" data-i18n="nav.home" class="active">Início</a>
+      <a href="#projects" data-section="projects" data-i18n="nav.projects">Projetos</a>
+      <a href="#about" data-section="about" data-i18n="nav.about">Sobre</a>
+      <a href="#contact" data-section="contact" data-i18n="nav.contact">Contacto</a>
+    </nav>
+    <button id="lang-toggle" aria-label="Switch language">EN</button>
+  </header>
+
+  <main class="ui-layer">
+    <section id="home" class="section active">
+      <div class="panel panel-hero">
+        <div class="hero">
+          <p class="hero-greeting" data-i18n="hero.greeting">Olá, eu sou</p>
+          <h1 class="hero-name" data-i18n="hero.name">João Pereira</h1>
+          <p class="hero-role" data-i18n="hero.role">Engenheiro de Software &amp; Investigador</p>
+          <p class="hero-intro" data-i18n="hero.intro">
+            Mestrando em cibersegurança e sistemas distribuídos no IST. Investigo sistemas de gestão de chaves no
+            INESC-ID e tenho um grande interesse em motores de jogos.
+          </p>
+          <a href="#projects" class="btn" data-section="projects" data-i18n="hero.cta">Ver projetos</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="panel">
+        <div class="section-head">
+          <p class="section-kicker">01</p>
+          <h2 data-i18n="projects.title">Projetos</h2>
+          <p class="section-subtitle" data-i18n="projects.subtitle">Uma seleção de coisas que construí</p>
+        </div>
+        <div id="projects-grid"></div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="panel panel-about">
+        <div class="section-head">
+          <p class="section-kicker">02</p>
+          <h2 data-i18n="about.title">Sobre mim</h2>
+        </div>
+        <p class="about-text" data-i18n="about.p1"></p>
+        <p class="about-text" data-i18n="about.p2"></p>
+        <p class="about-text" data-i18n="about.p3"></p>
+        <h3 class="skills-label" data-i18n="about.skillsLabel">Competências</h3>
+        <div id="skills"></div>
+        <h3 class="skills-label" data-i18n="about.languagesLabel">Idiomas</h3>
+        <div id="languages"></div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="panel panel-contact">
+        <div class="section-head">
+          <p class="section-kicker">03</p>
+          <h2 data-i18n="contact.title">Contacto</h2>
+          <p class="section-subtitle" data-i18n="contact.subtitle">Tens um projeto em mente? Fala comigo.</p>
+        </div>
+        <p class="contact-label" data-i18n="contact.emailLabel">Escreve-me para</p>
+        <a id="contact-email" class="btn btn-email" data-i18n-href="contact.email" href="mailto:hello@teudominio.pt"
+          data-i18n="contact.email"></a>
+        <div id="socials"></div>
+      </div>
+    </section>
+  </main>
 </body>
 
 </html>
