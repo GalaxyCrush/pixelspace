@@ -42,6 +42,12 @@ class World {
     this.transition = null;
     this.section = null;
     this.clock = new Clock();
+    this.pointer = { x: 0, y: 0 };
+
+    window.addEventListener("mousemove", (e) => {
+      this.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
+    });
 
     this.setSection(SECTIONS[0].id, { instant: true });
   }
@@ -86,6 +92,10 @@ class World {
     this.particles.rotation.y += delta * 0.005;
     this.nebulas.rotation.y += delta * 0.003;
     this.comets.update(delta);
+
+    this.camera.position.x += (this.pointer.x * 0.55 - this.camera.position.x) * 0.045;
+    this.camera.position.y += (-this.pointer.y * 0.35 - this.camera.position.y) * 0.045;
+    this.camera.lookAt(0, 0, 0);
 
     if (this.transition) {
       this.transition.t += delta / TRANSITION_DURATION;

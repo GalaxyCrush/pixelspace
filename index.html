@@ -29,7 +29,7 @@
         <div class="hero">
           <p class="hero-greeting" data-i18n="hero.greeting">Olá, eu sou</p>
           <h1 class="hero-name" data-i18n="hero.name">João Pereira</h1>
-          <p class="hero-role" data-i18n="hero.role">Engenheiro de Software &amp; Investigador</p>
+          <p class="hero-role" data-i18n="hero.role">Engenheiro de Software</p>
           <p class="hero-intro" data-i18n="hero.intro">
             Mestrando em cibersegurança e sistemas distribuídos no IST. Investigo sistemas de gestão de chaves no
             INESC-ID e tenho um grande interesse em motores de jogos.
@@ -59,6 +59,8 @@
         <p class="about-text" data-i18n="about.p1"></p>
         <p class="about-text" data-i18n="about.p2"></p>
         <p class="about-text" data-i18n="about.p3"></p>
+        <h3 class="skills-label" data-i18n="about.timelineLabel">Trajetória</h3>
+        <ul id="timeline"></ul>
         <h3 class="skills-label" data-i18n="about.skillsLabel">Competências</h3>
         <div id="skills"></div>
         <h3 class="skills-label" data-i18n="about.languagesLabel">Idiomas</h3>
@@ -76,10 +78,25 @@
         <p class="contact-label" data-i18n="contact.emailLabel">Escreve-me para</p>
         <a id="contact-email" class="btn btn-email" data-i18n-href="contact.email" href="mailto:hello@teudominio.pt"
           data-i18n="contact.email"></a>
+        <a id="cv-button" class="btn btn-ghost" target="_blank" rel="noopener" hidden></a>
         <div id="socials"></div>
       </div>
     </section>
   </main>
+
+  <dialog id="project-modal" class="modal">
+    <div class="modal-card">
+      <button id="modal-close" class="modal-close" aria-label="Close">✕</button>
+      <h3 id="modal-title"></h3>
+      <p id="modal-details" class="modal-details"></p>
+      <ul id="modal-highlights" class="modal-highlights"></ul>
+      <div id="modal-tags" class="project-tags"></div>
+      <div class="modal-foot">
+        <a id="modal-link" class="btn" target="_blank" rel="noopener">GitHub ↗</a>
+        <button id="modal-close-label" class="btn btn-ghost"></button>
+      </div>
+    </div>
+  </dialog>
 </body>
 
 </html>
